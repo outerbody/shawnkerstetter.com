@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>Penns Corner CSA Pickup Locations</title>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAqKUa1fr1bIpXvU5t3i02kBRlcNFm_JbfXwOevEGgYvWAptF7MxTR6o01mBgs2hfWqnLHrXstSazfNg"
+      type="text/javascript"></script>
+    <script type="text/javascript">
+
+    //<![CDATA[
+
+
+    function load() {
+      if (GBrowserIsCompatible()) {
+        options = {size:new GSize(600, 700), mapTypes:G_DEFAULT_MAP_TYPES};
+        var map = new GMap2(document.getElementById("map"), options);
+        map.enableContinuousZoom();
+        map.enableScrollWheelZoom();
+        map.addControl(new GLargeMapControl());
+        map.addControl(new GMapTypeControl());
+        map.setCenter(new GLatLng(40.442297, -79.98, false), 12);
+        
+         GDownloadUrl("locations.csv", function(text) {
+             parseData(map, text);
+         });
+
+      }
+    }
+
+ 
+    function parseData(map, text) {
+        var locations = text.split("\n");
+        for (i = 0; i < locations.length; i++) {
+            info = locations[i].split(",");
+            if (info && info.length > 4) {
+                map.addOverlay(createMarker(map, info[0], info[1], info[2], info[3], info[4]));
+            }
+        }
+    }
+
+    function createMarker(map, title, address, pickup, lat, lng) {
+      var point = new GLatLng(lat, lng);
+      options = { title:title };
+      var marker = new GMarker(point, options);
+
+      GEvent.addListener(marker, "click", function() {
+            var html = "<B>" + title + "</B><BR>" + address + "<BR>" + pickup;
+            map.openInfoWindowHtml(point, html);
+      });
+
+     return marker;
+   }
+
+    //]]>
+    </script>
+  </head>
+  <body onload="load()" onunload="GUnload()">
+    <div id="map" style="width: 600px; height: 700px"></div>
+  </body>
+</html>
